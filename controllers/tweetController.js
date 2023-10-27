@@ -32,14 +32,19 @@ async function edit(req, res) {}
 
 // Update the specified resource in storage.
 async function update(req, res) {
+  try{
   const tweet = await Tweet.findById(req.params.id);
   if (tweet.likes.includes(req.auth.sub)) {
     await Tweet.findByIdAndUpdate(req.params.id, { $pull: { likes: req.auth.sub } });
   } else {
     await Tweet.findByIdAndUpdate(req.params.id, { $push: { likes: req.auth.sub } });
   }
-  const likes = tweet.likes.length();
-  res.json(likes);
+  const likes = tweet.likes.length;
+  res.json(`likes <3: ${likes}`);
+}catch (error){
+  console.error(error);
+    return res.json({ error: "Error - Something went wrong, please try again later" });
+}
 }
 
 // Remove the specified resource from storage.
