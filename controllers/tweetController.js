@@ -11,7 +11,20 @@ async function show(req, res) {}
 async function create(req, res) {}
 
 // Store a newly created resource in storage.
-async function store(req, res) {}
+async function store(req, res) {
+  const tweet = new Tweet({
+    content: req.body.content,
+    user: req.auth.sub,
+    likes: [],
+  });
+  await Tweet.create(tweet);
+
+  const user = await User.findById(req.auth.sub);
+  user.tweets.push(tweet);
+  await user.save();
+
+  res.json(tweet);
+}
 
 // Show the form for editing the specified resource.
 async function edit(req, res) {}

@@ -31,7 +31,7 @@ module.exports = (app) => {
    */
 
   app.use("/users", userRoutes);
-  app.use("/tweet", tweetRoutes);
+  app.use("/tweets", tweetRoutes);
   app.use("/", publicRoutes);
   app.use("/", privateRoutes);
   app.use("/", authRoutes);
