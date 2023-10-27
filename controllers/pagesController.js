@@ -16,6 +16,8 @@
  * no debería existir.
  */
 
+const User = require("../models/User");
+
 async function showHome(req, res) {}
 
 async function showContact(req, res) {}
@@ -24,11 +26,13 @@ async function showAboutUs(req, res) {}
 
 async function show404(req, res) {}
 
-// Otros handlers...
-// ...
+async function showUser(req, res) {
+  const user = await User.findOne({ username: req.params.username }).populate();
+}
 
 module.exports = {
   showHome,
   showContact,
   showAboutUs,
+  showUser,
 };
