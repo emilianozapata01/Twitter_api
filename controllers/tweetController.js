@@ -33,17 +33,34 @@ async function edit(req, res) {}
 // Update the specified resource in storage.
 async function update(req, res) {
   const tweet = await Tweet.findById(req.params.id);
-  if(tweet.likes.includes(req.auth.sub)){
-    await Tweet.findByIdAndUpdate(req.params.id, {$pull:{likes:req.auth.sub}})
-  }else{
-    await Tweet.findByIdAndUpdate(req.params.id, {$push:{likes:req.auth.sub}})
-  };
+  if (tweet.likes.includes(req.auth.sub)) {
+    await Tweet.findByIdAndUpdate(req.params.id, { $pull: { likes: req.auth.sub } });
+  } else {
+    await Tweet.findByIdAndUpdate(req.params.id, { $push: { likes: req.auth.sub } });
+  }
   const likes = tweet.likes.length();
   res.json(likes);
 }
 
 // Remove the specified resource from storage.
-async function destroy(req, res) {}
+async function destroy(req, res) {
+  try {
+    const tweetId = req.params.id;
+    const userIdFromToken = req.auth.sub;
+    const tweet = await Tweet.findById(tweetId);
+    if (!tweet) {
+      return res.json({ error: "Tweet not found" });
+    }
+    if (tweet.user.toString() !== userIdFromToken) {
+      return res.json({ error: "You are not the owner of this tweet" });
+    }
+    await Tweet.findByIdAndDelete(tweetId);
+    return res.json({ msg: "Tweet succesfully removed" });
+  } catch (error) {
+    console.error(error);
+    return res.json({ error: "Error - Tweet not removed" });
+  }
+}
 
 // Otros handlers...
 // ...
@@ -57,5 +74,3 @@ module.exports = {
   update,
   destroy,
 };
-
-
