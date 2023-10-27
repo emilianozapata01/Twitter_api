@@ -3,7 +3,10 @@ const Tweet = require("../models/Tweet");
 const { includes } = require("lodash");
 
 // Display a listing of the resource.
-async function index(req, res) {}
+async function index(req, res) {
+  const tweet = await Tweet.find();
+  res.json(tweet.slice(-20))
+}
 
 // Display the specified resource.
 async function show(req, res) {}
