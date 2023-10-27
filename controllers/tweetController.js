@@ -48,12 +48,10 @@ async function destroy(req, res) {
     const tweetId = req.params.id;
     const userIdFromToken = req.auth.sub;
     const tweet = await Tweet.findById(tweetId);
-    if (!tweet) {
-      return res.json({ error: "Tweet not found" });
-    }
     if (tweet.user.toString() !== userIdFromToken) {
       return res.json({ error: "You are not the owner of this tweet" });
     }
+    await User.findByIdAndUpdate(tweet.user, { $pull: { tweets: tweet._id } });
     await Tweet.findByIdAndDelete(tweetId);
     return res.json({ msg: "Tweet succesfully removed" });
   } catch (error) {
