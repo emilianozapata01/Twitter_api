@@ -5,7 +5,7 @@ const { includes } = require("lodash");
 // Display a listing of the resource.
 async function index(req, res) {
   const tweet = await Tweet.find();
-  res.json(tweet.slice(-20))
+  res.json(tweet.slice(-20));
 }
 
 // Display the specified resource.
