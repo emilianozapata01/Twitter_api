@@ -10,7 +10,7 @@ router.get("/", tweetController.index);
 // router.get("/:id", tweetController.show);
 router.post("/", tweetController.store);
 // router.get("/editar/:id", tweetController.edit);
-router.patch("/:id", tweetController.update);
+router.patch("/:id/likes", tweetController.update);
 router.delete("/:id", tweetController.destroy);
 
 module.exports = router;
