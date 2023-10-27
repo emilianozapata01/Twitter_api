@@ -17,6 +17,7 @@
  */
 
 const User = require("../models/User");
+const _ = require("lodash");
 
 async function showHome(req, res) {}
 
@@ -27,7 +28,10 @@ async function showAboutUs(req, res) {}
 async function show404(req, res) {}
 
 async function showUser(req, res) {
-  const user = await User.findOne({ username: req.params.username }).populate();
+  const user = await User.findOne({ username: req.params.username })
+    .populate("tweets")
+    .select("-password");
+  res.json({ user });
 }
 
 module.exports = {
