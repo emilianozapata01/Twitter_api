@@ -14,10 +14,15 @@ module.exports = async () => {
         date: faker.date.anytime(),
         likes: [],
       });
+
+      const usersLikes = _.sampleSize(users, _.random(6));
+      for (const u of usersLikes) {
+        tweet.likes.push(u._id);
+      }
+
       tweets.push(tweet);
       user.tweets.push(tweet);
       await user.save();
-      console.log(tweet.user);
     }
   }
   await Tweet.insertMany(tweets);

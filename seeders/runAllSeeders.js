@@ -31,9 +31,7 @@ async function runAllSeeders() {
   // Seeders:
   await conn.dropDatabase();
 
-  const { seederUser } = require("./userSeeder");
-  await seederUser();
-
+  await require("./userSeeder")();
   await require("./tweetSeeder")();
   /**
    * Aquí se pueden ejectuar otros seeders que hayan en el sistema.
