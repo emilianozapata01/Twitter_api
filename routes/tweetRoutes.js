@@ -11,6 +11,6 @@ router.get("/", tweetController.index);
 router.post("/", tweetController.store);
 // router.get("/editar/:id", tweetController.edit);
 router.patch("/:id", tweetController.update);
-router.delete("/:id", tweetController.destroy);
+router.delete("/:id", authenticate, tweetController.destroy);
 
 module.exports = router;
