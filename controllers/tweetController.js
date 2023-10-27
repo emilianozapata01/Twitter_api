@@ -20,7 +20,40 @@ async function edit(req, res) {}
 async function update(req, res) {}
 
 // Remove the specified resource from storage.
-async function destroy(req, res) {}
+
+/* async function destroy(req, res) {
+  try {
+    const tweetId = req.params.id;
+    const deletedTweet = await Tweet.findByIdAndDelete(tweetId);
+    if (!deletedTweet) {
+      return res.json({error: "Tweet not found"});
+    } else {
+      return res.json({msg: "Tweet succesfully removed"});
+    }
+  } catch (error) {
+    console.error(error);
+    res.json({error: "Error - Tweet not removed"});
+  }
+} */
+
+async function destroy(req, res) {
+  try {
+    const tweetId = req.params.id;
+    const userIdFromToken = req.auth.sub;
+    const tweet = await Tweet.findById(tweetId);
+    if (!tweet) {
+      return res.json({ error: "Tweet not found" });
+    }
+    if (tweet.user.toString() !== userIdFromToken) {
+      return res.json({ error: "You are not the owner of this tweet" });
+    }
+    await Tweet.findByIdAndDelete(tweetId);
+    return res.json({ msg: "Tweet succesfully removed" });
+  } catch (error) {
+    console.error(error);
+    return res.json({ error: "Error - Tweet not removed" });
+  }
+}
 
 // Otros handlers...
 // ...
