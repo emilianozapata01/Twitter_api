@@ -4,8 +4,10 @@ const { includes } = require("lodash");
 
 // Display a listing of the resource.
 async function index(req, res) {
-  const tweet = await Tweet.find();
-  res.json(tweet.slice(-20));
+  const latestTweets = await Tweet.find()
+  .sort({ createdAt: -1 })
+  .limit(20);
+  res.json(latestTweets);
 }
 
 // Display the specified resource.

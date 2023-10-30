@@ -15,8 +15,6 @@
  */
 
 require("dotenv").config();
-const mongoose = require("mongoose");
-const conn = mongoose.createConnection("mongodb://127.0.0.1/ha-bootcamp-twitter");
 
 async function runAllSeeders() {
   /**
@@ -25,12 +23,10 @@ async function runAllSeeders() {
    *
    * PD: El método `dropDatabase` de Mongoose elimina toda la base de datos.
    */
-  // const { mongoose } = require("../db");
-  // await mongoose.connection.dropDatabase();
+  const { mongoose } = require("../db");
+  await mongoose.connection.dropDatabase();
 
   // Seeders:
-  await conn.dropDatabase();
-
   await require("./userSeeder")();
   await require("./tweetSeeder")();
   /**
