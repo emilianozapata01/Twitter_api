@@ -1,13 +1,12 @@
 const User = require("../models/User");
 const Tweet = require("../models/Tweet");
-const { includes } = require("lodash");
 
 // Display a listing of the resource.
 async function index(req, res) {
   const latestTweets = await Tweet.find()
-  .sort({ createdAt: -1 })
-  .limit(20);
-  res.json(latestTweets);
+    .sort({ createdAt: req.query.order === "asc" ? -1 : 1 })
+    .limit(req.query.limit);
+  return res.json(latestTweets);
 }
 
 // Display the specified resource.
@@ -18,18 +17,17 @@ async function create(req, res) {}
 
 // Store a newly created resource in storage.
 async function store(req, res) {
-  const tweet = new Tweet({
+  const tweet = await Tweet.create({
     content: req.body.content,
     user: req.auth.sub,
     likes: [],
   });
-  await Tweet.create(tweet);
 
   const user = await User.findById(req.auth.sub);
-  user.tweets.push(tweet);
+  user.tweets.push(tweet._id);
   await user.save();
 
-  res.json(tweet);
+  return res.json(tweet);
 }
 
 // Show the form for editing the specified resource.
@@ -37,19 +35,19 @@ async function edit(req, res) {}
 
 // Update the specified resource in storage.
 async function update(req, res) {
-  try{
-  const tweet = await Tweet.findById(req.params.id);
-  if (tweet.likes.includes(req.auth.sub)) {
-    await Tweet.findByIdAndUpdate(req.params.id, { $pull: { likes: req.auth.sub } });
-  } else {
-    await Tweet.findByIdAndUpdate(req.params.id, { $push: { likes: req.auth.sub } });
-  }
-  const likes = tweet.likes.length;
-  res.json(`likes <3: ${likes}`);
-}catch (error){
-  console.error(error);
+  try {
+    const tweet = await Tweet.findById(req.params.id);
+    tweet.likes.includes(req.auth.sub) // includes _ metodo de mongoose
+      ? tweet.likes.pull(req.auth.sub)
+      : tweet.likes.push(req.auth.sub);
+
+    await tweet.save();
+    const likes = tweet.likes.length;
+    return res.json(`likes <3: ${likes}`);
+  } catch (error) {
+    console.error(error);
     return res.json({ error: "Error - Something went wrong, please try again later" });
-}
+  }
 }
 
 // Remove the specified resource from storage.
@@ -58,11 +56,16 @@ async function destroy(req, res) {
     const tweetId = req.params.id;
     const userIdFromToken = req.auth.sub;
     const tweet = await Tweet.findById(tweetId);
-    if (tweet.user.toString() !== userIdFromToken) {
+
+    if (tweet.user.toString() !== userIdFromToken)
       return res.json({ error: "You are not the owner of this tweet" });
-    }
-    await User.findByIdAndUpdate(tweet.user, { $pull: { tweets: tweet._id } });
-    await Tweet.findByIdAndDelete(tweetId);
+
+    const user = await User.findById(userIdFromToken);
+    user.tweets.pull(tweetId);
+    await user.save();
+
+    await tweet.deleteOne();
+
     return res.json({ msg: "Tweet succesfully removed" });
   } catch (error) {
     console.error(error);
