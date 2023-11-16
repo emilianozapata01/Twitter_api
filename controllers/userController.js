@@ -1,6 +1,7 @@
 const User = require("../models/User");
 const formidable = require("formidable");
 const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
 
 // Display a listing of the resource.
 async function index(req, res) {}
@@ -32,7 +33,17 @@ async function store(req, res) {
       pfp: files.pfp.newFilename,
       tweets: [],
     });
-    res.json(newUser);
+    
+    const user = await User.findOne({ email: fields.email });
+    if (!user) return res.json({ msg: "Wrong credentials..." });
+  
+    const verifyPassword = await bcrypt.compare(fields.password, user.password);
+    if (!verifyPassword) return res.json({ msg: "Wrong credentials..." });
+  
+    const token = jwt.sign({ sub: user.id }, process.env.JWT_SECRET);
+    const { firstname, lastname, email, pfp, username, _id } = user;
+    return res.json({ token, firstname, lastname, email, pfp, username, id: _id });
+    
   });
 }
 
