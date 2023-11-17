@@ -3,7 +3,14 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
 async function getToken(req, res) {
-  const user = await User.findOne({ email: req.body.email });
+  let user;
+
+  if (req.body.usernameOrEmail.includes("@")) {
+    user = await User.findOne({ email: req.body.usernameOrEmail });
+  } else {
+    user = await User.findOne({ username: req.body.usernameOrEmail });
+  }
+
   if (!user) return res.json({ msg: "Wrong credentials..." });
 
   const verifyPassword = await bcrypt.compare(req.body.password, user.password);
