@@ -4,6 +4,7 @@ const Tweet = require("../models/Tweet");
 // Display a listing of the resource.
 async function index(req, res) {
   const latestTweets = await Tweet.find()
+    .populate("user", "-password -email -tweets")
     .sort({ createdAt: req.query.order === "asc" ? -1 : 1 })
     .limit(req.query.limit);
   return res.json(latestTweets);

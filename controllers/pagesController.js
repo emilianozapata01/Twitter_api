@@ -29,7 +29,7 @@ async function show404(req, res) {}
 async function showUser(req, res) {
   const user = await User.findOne({ username: req.params.username })
     .populate("tweets")
-    .select("-password");
+    .select("-password -email");
   return res.json({ user });
 }
 
