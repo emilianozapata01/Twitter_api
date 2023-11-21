@@ -9,6 +9,8 @@ const userSchema = new Schema({
   description: String,
   pfp: String,
   tweets: [{ type: Schema.Types.ObjectId, ref: "Tweet" }],
+  followers: [{ type: Schema.Types.ObjectId, ref: "User" }],
+  following: [{ type: Schema.Types.ObjectId, ref: "User" }],
 });
 
 const User = mongoose.model("User", userSchema);

@@ -17,8 +17,18 @@ async function getToken(req, res) {
   if (!verifyPassword) return res.json({ msg: "Wrong credentials..." });
 
   const token = jwt.sign({ sub: user.id }, process.env.JWT_SECRET);
-  const { firstname, lastname, email, pfp, username, _id } = user;
-  return res.json({ token, firstname, lastname, email, pfp, username, id: _id });
+  const { firstname, lastname, email, pfp, username, _id, followers, following } = user;
+  return res.json({
+    token,
+    firstname,
+    lastname,
+    email,
+    pfp,
+    username,
+    id: _id,
+    followers,
+    following,
+  });
 }
 
 module.exports = {

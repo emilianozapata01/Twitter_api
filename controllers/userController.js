@@ -33,17 +33,16 @@ async function store(req, res) {
       pfp: files.pfp.newFilename,
       tweets: [],
     });
-    
+
     const user = await User.findOne({ email: fields.email });
     if (!user) return res.json({ msg: "Wrong credentials..." });
-  
+
     const verifyPassword = await bcrypt.compare(fields.password, user.password);
     if (!verifyPassword) return res.json({ msg: "Wrong credentials..." });
-  
+
     const token = jwt.sign({ sub: user.id }, process.env.JWT_SECRET);
     const { firstname, lastname, email, pfp, username, _id } = user;
     return res.json({ token, firstname, lastname, email, pfp, username, id: _id });
-    
   });
 }
 
@@ -51,7 +50,26 @@ async function store(req, res) {
 async function edit(req, res) {}
 
 // Update the specified resource in storage.
-async function update(req, res) {}
+async function update(req, res) {
+  const myUser = await User.findById(req.auth.sub);
+  const userToFollow = await User.findById(req.params.id);
+
+  if (myUser._id === userToFollow._id) return;
+
+  if (userToFollow.followers.includes(myUser._id)) {
+    userToFollow.followers.pull(myUser._id);
+    myUser.following.pull(userToFollow._id);
+  } else {
+    userToFollow.followers.push(myUser._id);
+    myUser.following.push(userToFollow._id);
+  }
+  await myUser.save();
+  await userToFollow.save();
+  return res.json({
+    myUserFollowing: myUser.following.length,
+    userToFollowFollowers: userToFollow.followers.length,
+  });
+}
 
 // Remove the specified resource from storage.
 async function destroy(req, res) {}
